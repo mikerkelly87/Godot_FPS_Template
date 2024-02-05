@@ -9,9 +9,10 @@ var stamina := max_stamina
 var crouch_speed := 2.0
 var can_sprint := true
 var is_sprinting := false
-var mouse_sensitivity := 0.001
+#var mouse_sensitivity := 0.001
 var max_health := 100.0
 var health := max_health
+var game_paused = false
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -27,8 +28,8 @@ func _ready():
 # Handle mouse look
 func _input(event):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		$Camera3D.rotate_x(-event.relative.y * mouse_sensitivity)
+		rotate_y(-event.relative.x * GameVars.mouse_sensitivity)
+		$Camera3D.rotate_x(-event.relative.y * GameVars.mouse_sensitivity)
 		$Camera3D.rotation.x = clampf($Camera3D.rotation.x, -deg_to_rad(70), deg_to_rad(70))
 
 
@@ -36,6 +37,7 @@ func _physics_process(delta: float) -> void:
 	update_stamina_bar()
 	#raycast_debugging()
 	shoot()
+	pause_menu()
 	
 	# Add the gravity.
 	if not is_on_floor():
@@ -93,6 +95,8 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+# Every second while sprinting, remove 10 stamina
+# Make the player unable to sprint if the stamina is 0
 func _on_sprint_cooldown_timeout() -> void:
 	stamina -= 10.0
 	if stamina < 0.0:
@@ -102,6 +106,8 @@ func _on_sprint_cooldown_timeout() -> void:
 		$SprintCooldown.stop()
 
 
+# When the player stops sprinting, add 10 stamina every second
+# until the stamina is full
 func _on_sprint_recharge_timeout() -> void:
 	if stamina < max_stamina:
 		stamina += 10.0
@@ -113,6 +119,8 @@ func _on_sprint_recharge_timeout() -> void:
 			$SprintRecharge.stop()
 
 
+# Update the stamina progress bar with the value of the player's stamina
+# Only show the stamina bar if the player's stamina is not full
 func update_stamina_bar() -> void:
 	$UI/Control/StaminaBar.value = stamina
 	if stamina < max_stamina:
@@ -121,6 +129,7 @@ func update_stamina_bar() -> void:
 		$UI/Control/StaminaBar.visible = false
 
 
+# Debugging funciton for testing ray casting
 func raycast_debugging() -> void:
 	if $Camera3D/RayCast3D.is_colliding() == true:
 		print("Raycast is colliding with an area")
@@ -128,15 +137,51 @@ func raycast_debugging() -> void:
 		var collided_object = $Camera3D/RayCast3D.get_collider()
 		print(collided_object_id)
 		print(collided_object)
+		print(collided_object.name)
 	elif $Camera3D/RayCast3D.is_colliding() == false:
-		print("Raycast is not colliding with an area")
+		pass
+		#print("Raycast is not colliding with an area")
 
 
+# Function to shoot enemies. If the player shoots while the ray cast connects
+# with an enemy Area3D hitbox, then emit the deal_damage signal, passing the 
+# ID of the object that was shot.
 func shoot() -> void:
 	if Input.is_action_just_pressed("shoot"):
 		if $Camera3D/RayCast3D.is_colliding() == true:
-			var collided_object = $Camera3D/RayCast3D.get_collider()
-			#print("You shot ", collided_object.name)
-			deal_damage.emit(collided_object)
+			var collided_object_id = $Camera3D/RayCast3D.get_collider_rid()
+			deal_damage.emit(collided_object_id)
+			$UI/Control/CenterContainer/CrosshairMain.visible = false
+			$UI/Control/CenterContainer/CrosshairHit.visible = true
+			$UI/CrosshairTimer.start()
 		elif $Camera3D/RayCast3D.is_colliding() == false:
-			print("You missed")
+			pass
+
+
+# Set the player's crosshair back to normal after landing a hit.
+func _on_crosshair_timer_timeout():
+	$UI/Control/CenterContainer/CrosshairMain.visible = true
+	$UI/Control/CenterContainer/CrosshairHit.visible = false
+
+
+# Access Pause menu
+func pause_menu():
+	if Input.is_action_just_pressed("pause"):
+		if game_paused == false:
+			$UI/Control.visible = false
+			$PauseMenu/PauseControl.visible = true
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			game_paused = true
+		elif game_paused == true:
+			$UI/Control.visible = true
+			$PauseMenu/PauseControl.visible = false
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			game_paused = false
+
+
+# Exit pause menu
+func _on_pause_menu_exit_pause_menu():
+	$PauseMenu/PauseControl.visible = false
+	$UI/Control.visible = true
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	game_paused = false

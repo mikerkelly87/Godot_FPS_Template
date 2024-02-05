@@ -1,7 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=12 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
+[ext_resource type="Texture2D" uid="uid://doc8ur52owxys" path="res://assets/crosshair_hit.png" id="3_y6qrd"]
+[ext_resource type="PackedScene" uid="uid://c8o5ew5sdyxh6" path="res://scenes/pause_menu.tscn" id="4_0uhqr"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xysup"]
 
@@ -84,11 +86,10 @@ max_value = 50.0
 show_percentage = false
 
 [node name="HealthBar" type="ProgressBar" parent="UI/Control"]
-layout_mode = 0
-offset_left = 24.0
-offset_top = 32.0
-offset_right = 474.0
-offset_bottom = 82.0
+layout_mode = 1
+offset_right = 450.0
+offset_bottom = 50.0
+size_flags_vertical = 1
 theme_override_styles/fill = SubResource("StyleBoxFlat_3rqw4")
 
 [node name="CenterContainer" type="CenterContainer" parent="UI/Control"]
@@ -99,12 +100,28 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TextureRect" type="TextureRect" parent="UI/Control/CenterContainer"]
+[node name="CrosshairMain" type="TextureRect" parent="UI/Control/CenterContainer"]
 custom_minimum_size = Vector2(65, 65)
 layout_mode = 2
 texture = ExtResource("2_7e26f")
 expand_mode = 1
 stretch_mode = 4
 
+[node name="CrosshairHit" type="TextureRect" parent="UI/Control/CenterContainer"]
+visible = false
+custom_minimum_size = Vector2(65, 65)
+layout_mode = 2
+texture = ExtResource("3_y6qrd")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="CrosshairTimer" type="Timer" parent="UI"]
+wait_time = 0.1
+one_shot = true
+
+[node name="PauseMenu" parent="." instance=ExtResource("4_0uhqr")]
+
 [connection signal="timeout" from="SprintCooldown" to="." method="_on_sprint_cooldown_timeout"]
 [connection signal="timeout" from="SprintRecharge" to="." method="_on_sprint_recharge_timeout"]
+[connection signal="timeout" from="UI/CrosshairTimer" to="." method="_on_crosshair_timer_timeout"]
+[connection signal="exit_pause_menu" from="PauseMenu" to="." method="_on_pause_menu_exit_pause_menu"]
