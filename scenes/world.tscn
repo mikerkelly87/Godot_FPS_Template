@@ -1,0 +1,99 @@
+[gd_scene load_steps=9 format=3 uid="uid://ci2wcilnt7cqd"]
+
+[ext_resource type="Texture2D" uid="uid://cq7ak4pwquq7h" path="res://assets/grass.jpg" id="1_5ket0"]
+[ext_resource type="PackedScene" uid="uid://bevugdkcaxjr3" path="res://scenes/player.tscn" id="2_opkle"]
+[ext_resource type="PackedScene" uid="uid://dt50c7iqiaws2" path="res://scenes/enemy.tscn" id="3_iwefc"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_kloqo"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wupjo"]
+size = Vector3(100.187, 1, 0.516113)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tqibw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b4r00"]
+albedo_texture = ExtResource("1_5ket0")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bbfrg"]
+size = Vector3(100.143, 1, 100.531)
+
+[node name="World" type="Node3D"]
+
+[node name="Player" parent="." instance=ExtResource("2_opkle")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.06177, 0)
+
+[node name="Wall01" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.00343, -44.8188)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Wall01"]
+transform = Transform3D(100, 0, 0, 0, 5, 0, 0, 0, 1, 0, 3.49772, -5.24451)
+mesh = SubResource("BoxMesh_kloqo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall01"]
+transform = Transform3D(1, 0, 0, 0, 5, 0, 0, 0, 1, 0.0108604, 3.50853, -4.98569)
+shape = SubResource("BoxShape3D_wupjo")
+
+[node name="Wall04" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.00343, 55.1258)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Wall04"]
+transform = Transform3D(100, 0, 0, 0, 5, 0, 0, 0, 1, 0, 3.49772, -5.24451)
+mesh = SubResource("BoxMesh_kloqo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall04"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0.0108604, 3.50853, -4.98569)
+shape = SubResource("BoxShape3D_wupjo")
+
+[node name="Wall02" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -44.5025, -1.00343, 0.238762)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Wall02"]
+transform = Transform3D(100, 0, 0, 0, 5, 0, 0, 0, 1, -8.9407e-08, 3.49772, -3.13416)
+mesh = SubResource("BoxMesh_kloqo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall02"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0.0108604, 3.50853, -4.98569)
+shape = SubResource("BoxShape3D_wupjo")
+
+[node name="Wall03" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 54.97, -1.00343, 0.238762)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Wall03"]
+transform = Transform3D(100, 0, 0, 0, 5, 0, 0, 0, 1, 0, 3.49772, -5.24451)
+mesh = SubResource("BoxMesh_kloqo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall03"]
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0.0108604, 3.50853, -4.98569)
+shape = SubResource("BoxShape3D_wupjo")
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0)
+mesh = SubResource("PlaneMesh_tqibw")
+skeleton = NodePath("../..")
+surface_material_override/0 = SubResource("StandardMaterial3D_b4r00")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0211544, -0.458016, -0.0638466)
+shape = SubResource("BoxShape3D_bbfrg")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 34.6472, 0)
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.353553, 0.612372, 0, 0.866025, 0.5, -0.707107, -0.353553, 0.612372, 0, 34.6472, 0)
+
+[node name="DirectionalLight3D3" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-1, 4.37114e-08, -7.57103e-08, 0, 0.866025, 0.5, 8.74228e-08, 0.5, -0.866025, 0, 34.6472, 0)
+
+[node name="DirectionalLight3D4" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1.19249e-08, 0.5, -0.866025, 0, 0.866025, 0.5, 1, -5.96244e-09, 1.03272e-08, 0, 34.6472, 0)
+
+[node name="Enemy" parent="." instance=ExtResource("3_iwefc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -45.0009)
+
+[node name="Enemy2" parent="." instance=ExtResource("3_iwefc")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.7844, 0, -45.0009)
+
+[connection signal="deal_damage" from="Player" to="Enemy" method="_on_player_deal_damage"]
