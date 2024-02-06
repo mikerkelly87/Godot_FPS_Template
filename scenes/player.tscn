@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=13 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
+[ext_resource type="PackedScene" uid="uid://rkso0qtvfb6d" path="res://scenes/m1911.tscn" id="2_ty3xy"]
 [ext_resource type="Texture2D" uid="uid://doc8ur52owxys" path="res://assets/crosshair_hit.png" id="3_y6qrd"]
 [ext_resource type="PackedScene" uid="uid://c8o5ew5sdyxh6" path="res://scenes/pause_menu.tscn" id="4_0uhqr"]
 
@@ -43,6 +44,9 @@ target_position = Vector3(0, -1, -100)
 collision_mask = 2
 collide_with_areas = true
 debug_shape_thickness = 1
+
+[node name="m1911" parent="Camera3D" instance=ExtResource("2_ty3xy")]
+transform = Transform3D(0.1, 0, 0, 0, 0.0939693, -0.034202, 0, 0.034202, 0.0939693, 0.398, -0.34, -0.649)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0628227, -0.0282702)

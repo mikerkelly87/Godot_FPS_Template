@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="3D_playing"
+config/name="Godot_FPS_Template"
 run/main_scene="res://scenes/world.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
@@ -24,6 +24,10 @@ GameVars="*res://scripts/game_vars.gd"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=3
+
+[filesystem]
+
+import/fbx/enabled=false
 
 [input]
 

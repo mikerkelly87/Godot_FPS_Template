@@ -23,6 +23,10 @@ signal deal_damage(object)
 func _ready():
 	# Capture mouse for mouse look
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	
+	# This is only here because at this time I can't figure out why the m1911
+	# instance starts itself off at the middle keyframe of the fire animation
+	$Camera3D/m1911/AnimationPlayer.play("fire")
 
 
 # Handle mouse look
@@ -148,6 +152,7 @@ func raycast_debugging() -> void:
 # ID of the object that was shot.
 func shoot() -> void:
 	if Input.is_action_just_pressed("shoot"):
+		$Camera3D/m1911/AnimationPlayer.play("fire")
 		if $Camera3D/RayCast3D.is_colliding() == true:
 			var collided_object_id = $Camera3D/RayCast3D.get_collider_rid()
 			deal_damage.emit(collided_object_id)
