@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=17 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
@@ -17,6 +17,62 @@ sky_material = SubResource("ShaderMaterial_83pgw")
 background_mode = 1
 background_color = Color(0.647059, 0.764706, 1, 1)
 sky = SubResource("Sky_3tf62")
+
+[sub_resource type="Animation" id="Animation_ekc64"]
+resource_name = "sprint"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.5, 0), Vector3(0, -0.080057, 0), Vector3(0, 0.08, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_djthn"]
+resource_name = "walk"
+length = 0.5
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.2, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, -0.08, 0), Vector3(0, 0.08, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_wwl2q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.5, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ion17"]
+_data = {
+"RESET": SubResource("Animation_wwl2q"),
+"sprint": SubResource("Animation_ekc64"),
+"walk": SubResource("Animation_djthn")
+}
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ek6oq"]
 radius = 0.57483
@@ -45,8 +101,13 @@ collision_mask = 2
 collide_with_areas = true
 debug_shape_thickness = 1
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Camera3D"]
+libraries = {
+"": SubResource("AnimationLibrary_ion17")
+}
+
 [node name="m1911" parent="Camera3D" instance=ExtResource("2_ty3xy")]
-transform = Transform3D(0.1, 0, 0, 0, 0.0939693, -0.034202, 0, 0.034202, 0.0939693, 0.398, -0.34, -0.649)
+transform = Transform3D(0.0965926, 0, 0.0258819, 0, 0.1, 0, -0.0258819, 0, 0.0965926, 0.503648, -0.385164, -0.748758)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0628227, -0.0282702)
