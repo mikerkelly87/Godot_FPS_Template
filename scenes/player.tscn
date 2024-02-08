@@ -1,8 +1,8 @@
-[gd_scene load_steps=17 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=18 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
-[ext_resource type="PackedScene" uid="uid://rkso0qtvfb6d" path="res://scenes/m1911.tscn" id="2_ty3xy"]
+[ext_resource type="PackedScene" uid="uid://djgxm3mdibqph" path="res://scenes/weapon.tscn" id="2_iiok8"]
 [ext_resource type="Texture2D" uid="uid://doc8ur52owxys" path="res://assets/crosshair_hit.png" id="3_y6qrd"]
 [ext_resource type="PackedScene" uid="uid://c8o5ew5sdyxh6" path="res://scenes/pause_menu.tscn" id="4_0uhqr"]
 
@@ -17,6 +17,21 @@ sky_material = SubResource("ShaderMaterial_83pgw")
 background_mode = 1
 background_color = Color(0.647059, 0.764706, 1, 1)
 sky = SubResource("Sky_3tf62")
+
+[sub_resource type="Animation" id="Animation_wwl2q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.5, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_ekc64"]
 resource_name = "sprint"
@@ -52,21 +67,6 @@ tracks/0/keys = {
 "values": [Vector3(0, -0.08, 0), Vector3(0, 0.08, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_wwl2q"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(0, 0.5, 0)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ion17"]
 _data = {
 "RESET": SubResource("Animation_wwl2q"),
@@ -84,8 +84,13 @@ bg_color = Color(0.133333, 0.145098, 0.717647, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3rqw4"]
 bg_color = Color(0.196078, 0.945098, 0.270588, 1)
 
+[sub_resource type="LabelSettings" id="LabelSettings_30j06"]
+font_size = 60
+
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.01527, 0)
+collision_layer = 5
+collision_mask = 5
 script = ExtResource("1_7mmla")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
@@ -95,7 +100,7 @@ mesh = SubResource("CapsuleMesh_xysup")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 environment = SubResource("Environment_6f0y4")
 
-[node name="RayCast3D" type="RayCast3D" parent="Camera3D"]
+[node name="WeaponRayCast" type="RayCast3D" parent="Camera3D"]
 target_position = Vector3(0, -1, -100)
 collision_mask = 2
 collide_with_areas = true
@@ -106,8 +111,12 @@ libraries = {
 "": SubResource("AnimationLibrary_ion17")
 }
 
-[node name="m1911" parent="Camera3D" instance=ExtResource("2_ty3xy")]
-transform = Transform3D(0.0965926, 0, 0.0258819, 0, 0.1, 0, -0.0258819, 0, 0.0965926, 0.503648, -0.385164, -0.748758)
+[node name="Weapon" parent="Camera3D" instance=ExtResource("2_iiok8")]
+transform = Transform3D(0.984808, 0, 0.173648, 0, 1, 0, -0.173648, 0, 0.984808, 0.458509, -0.297806, -0.735071)
+
+[node name="ItemRayCast" type="RayCast3D" parent="Camera3D"]
+target_position = Vector3(0, -1, -2)
+collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0628227, -0.0282702)
@@ -140,10 +149,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -224.0
-offset_top = -104.0
-offset_right = 226.0
-offset_bottom = -54.0
+offset_left = -225.0
+offset_top = -74.0
+offset_right = 225.0
+offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/fill = SubResource("StyleBoxFlat_gx33c")
@@ -156,6 +165,23 @@ offset_right = 450.0
 offset_bottom = 50.0
 size_flags_vertical = 1
 theme_override_styles/fill = SubResource("StyleBoxFlat_3rqw4")
+
+[node name="message_text" type="Label" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -732.0
+offset_top = -249.0
+offset_right = 726.0
+offset_bottom = -166.0
+grow_horizontal = 2
+grow_vertical = 0
+label_settings = SubResource("LabelSettings_30j06")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CenterContainer" type="CenterContainer" parent="UI/Control"]
 layout_mode = 1

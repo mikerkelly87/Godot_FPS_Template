@@ -1,8 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://ci2wcilnt7cqd"]
+[gd_scene load_steps=12 format=3 uid="uid://ci2wcilnt7cqd"]
 
 [ext_resource type="Texture2D" uid="uid://cq7ak4pwquq7h" path="res://assets/grass.jpg" id="1_5ket0"]
 [ext_resource type="PackedScene" uid="uid://bevugdkcaxjr3" path="res://scenes/player.tscn" id="2_opkle"]
 [ext_resource type="PackedScene" uid="uid://dt50c7iqiaws2" path="res://scenes/enemy.tscn" id="3_iwefc"]
+[ext_resource type="PackedScene" uid="uid://cxgd3jl13k1k" path="res://scenes/gun_rack.tscn" id="4_no32i"]
+[ext_resource type="PackedScene" uid="uid://bjif36ktvwfx1" path="res://scenes/pickup_blue_gun.tscn" id="5_cilem"]
+[ext_resource type="PackedScene" uid="uid://bokmkmytedmor" path="res://scenes/pickup_red_gun.tscn" id="6_ow560"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_kloqo"]
 
@@ -12,7 +15,9 @@ size = Vector3(100.187, 1, 0.516113)
 [sub_resource type="PlaneMesh" id="PlaneMesh_tqibw"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b4r00"]
+albedo_color = Color(0, 0.576471, 0.117647, 1)
 albedo_texture = ExtResource("1_5ket0")
+albedo_texture_force_srgb = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bbfrg"]
 size = Vector3(100.143, 1, 100.531)
@@ -95,5 +100,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.7844, 0, -45.0009)
 
 [node name="Player" parent="." instance=ExtResource("2_opkle")]
 
+[node name="gun_rack" parent="." instance=ExtResource("4_no32i")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.6107, 0, 0)
+
+[node name="PickupBlueGun" parent="." instance=ExtResource("5_cilem")]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 37.9675, 0.563997, -1.01869)
+
+[node name="PickupRedGun" parent="." instance=ExtResource("6_ow560")]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 37.9576, 0.551462, 0.93514)
+
 [connection signal="deal_damage" from="Player" to="Enemy" method="_on_player_deal_damage"]
 [connection signal="deal_damage" from="Player" to="Enemy2" method="_on_player_deal_damage"]
+[connection signal="display_message" from="PickupBlueGun" to="Player" method="_on_pickup_blue_gun_display_message"]
+[connection signal="stop_message" from="PickupBlueGun" to="Player" method="_on_pickup_blue_gun_stop_message"]

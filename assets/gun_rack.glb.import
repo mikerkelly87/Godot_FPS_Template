@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bdouluuius4i2"
-path="res://.godot/imported/m4a1.glb-5af7757e91b99a6e929333ffec93faf3.scn"
+uid="uid://bhwtuwte2jxce"
+path="res://.godot/imported/gun_rack.glb-550874d8804bba4647d923b1f653d01f.scn"
 
 [deps]
 
-source_file="res://assets/m4a1.glb"
-dest_files=["res://.godot/imported/m4a1.glb-5af7757e91b99a6e929333ffec93faf3.scn"]
+source_file="res://assets/gun_rack.glb"
+dest_files=["res://.godot/imported/gun_rack.glb-550874d8804bba4647d923b1f653d01f.scn"]
 
 [params]
 

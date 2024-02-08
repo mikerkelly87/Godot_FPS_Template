@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://djgxm3mdibqph"]
+
+[ext_resource type="PackedScene" uid="uid://cknrigahw8f8k" path="res://scenes/blue_gun.tscn" id="1_vqwax"]
+[ext_resource type="PackedScene" uid="uid://hm0xp1vg2is5" path="res://scenes/red_gun.tscn" id="2_1pjdr"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_kg6o3"]
+
+[node name="Weapon" type="Node3D"]
+
+[node name="DummyPlayer" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.015, 0)
+visible = false
+mesh = SubResource("CapsuleMesh_kg6o3")
+
+[node name="Camera3D" type="Camera3D" parent="DummyPlayer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+visible = false
+
+[node name="BlueGun" parent="." instance=ExtResource("1_vqwax")]
+visible = false
+
+[node name="RedGun" parent="." instance=ExtResource("2_1pjdr")]
+visible = false

@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bn0rlol1kc84c"]
-
-[ext_resource type="PackedScene" uid="uid://bdouluuius4i2" path="res://assets/m4a1.glb" id="1_mqnvr"]
-
-[node name="M4A1" type="Node3D"]
-
-[node name="m4a1" parent="." instance=ExtResource("1_mqnvr")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.117916, 0, -1.08276)

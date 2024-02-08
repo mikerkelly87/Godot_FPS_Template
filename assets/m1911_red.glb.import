@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cd8kgy5muvowb"
-path="res://.godot/imported/m1911tactical.glb-cdd650dbd8bf7d2e72077cb45a65f9e0.scn"
+uid="uid://dweqwsydiwh16"
+path="res://.godot/imported/m1911_red.glb-70bf39b241a3bffa141696dfcf2505a7.scn"
 
 [deps]
 
-source_file="res://assets/m1911tactical.glb"
-dest_files=["res://.godot/imported/m1911tactical.glb-cdd650dbd8bf7d2e72077cb45a65f9e0.scn"]
+source_file="res://assets/m1911_red.glb"
+dest_files=["res://.godot/imported/m1911_red.glb-70bf39b241a3bffa141696dfcf2505a7.scn"]
 
 [params]
 

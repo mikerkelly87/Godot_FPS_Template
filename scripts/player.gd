@@ -14,6 +14,7 @@ var can_shoot := true
 var max_health := 100.0
 var health := max_health
 var game_paused = false
+var current_weapon := "BlueGun" # choices: BlueGun, RedGun
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -43,6 +44,7 @@ func _physics_process(delta: float) -> void:
 	#raycast_debugging()
 	shoot()
 	pause_menu()
+	weapon_select()
 	
 	# Add the gravity.
 	if not is_on_floor():
@@ -150,17 +152,33 @@ func update_stamina_bar() -> void:
 
 # Debugging funciton for testing ray casting
 func raycast_debugging() -> void:
-	if $Camera3D/RayCast3D.is_colliding() == true:
+	if $Camera3D/WeaponRayCast.is_colliding() == true:
 		print("Raycast is colliding with an area")
-		var collided_object_id = $Camera3D/RayCast3D.get_collider_rid()
-		var collided_object = $Camera3D/RayCast3D.get_collider()
+		var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
+		var collided_object = $Camera3D/WeaponRayCast.get_collider()
 		print(collided_object_id)
 		print(collided_object)
 		print(collided_object.name)
-	elif $Camera3D/RayCast3D.is_colliding() == false:
+	elif $Camera3D/WeaponRayCast.is_colliding() == false:
 		pass
 		#print("Raycast is not colliding with an area")
 
+
+# Function to handle weapon selection. All weapons are attached to the weapon node
+# and are not visible by default unless they are set as the current_weapon.
+func weapon_select():
+	# Handle weapon selection with number keys
+	if Input.is_action_just_pressed("select_weapon_1"):
+		current_weapon = "BlueGun"
+	if Input.is_action_just_pressed("select_weapon_2"):
+		current_weapon = "RedGun"
+	# Make the current weapon visible
+	if current_weapon == "RedGun":
+		$Camera3D/Weapon/RedGun.visible = true
+		$Camera3D/Weapon/BlueGun.visible = false
+	if current_weapon == "BlueGun":
+		$Camera3D/Weapon/RedGun.visible = false
+		$Camera3D/Weapon/BlueGun.visible = true
 
 # Function to shoot enemies. If the player shoots while the ray cast connects
 # with an enemy Area3D hitbox, then emit the deal_damage signal, passing the 
@@ -168,14 +186,17 @@ func raycast_debugging() -> void:
 func shoot() -> void:
 	if Input.is_action_just_pressed("shoot"):
 		if can_shoot == true:
-			$Camera3D/m1911/AnimationPlayer.play("fire")
-			if $Camera3D/RayCast3D.is_colliding() == true:
-				var collided_object_id = $Camera3D/RayCast3D.get_collider_rid()
+			if current_weapon == "RedGun":
+				$Camera3D/Weapon/RedGun/AnimationPlayer.play("fire")
+			if current_weapon == "BlueGun":
+				$Camera3D/Weapon/BlueGun/AnimationPlayer.play("fire")
+			if $Camera3D/WeaponRayCast.is_colliding() == true:
+				var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
 				deal_damage.emit(collided_object_id)
 				$UI/Control/CenterContainer/CrosshairMain.visible = false
 				$UI/Control/CenterContainer/CrosshairHit.visible = true
 				$UI/CrosshairTimer.start()
-			elif $Camera3D/RayCast3D.is_colliding() == false:
+			elif $Camera3D/WeaponRayCast.is_colliding() == false:
 				pass
 
 
@@ -206,3 +227,12 @@ func _on_pause_menu_exit_pause_menu():
 	$UI/Control.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	game_paused = false
+
+
+# Display blue gun pickup text
+func _on_pickup_blue_gun_display_message(message):
+	$UI/Control/message_text.text = message
+
+# Stop displaying blue gun pickup text
+func _on_pickup_blue_gun_stop_message():
+	$UI/Control/message_text.text = ""

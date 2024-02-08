@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cxgd3jl13k1k"]
+
+[ext_resource type="PackedScene" uid="uid://bhwtuwte2jxce" path="res://assets/gun_rack.glb" id="1_enrfj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sc101"]
+size = Vector3(2.04541, 1.05957, 2.8067)
+
+[node name="gun_rack" instance=ExtResource("1_enrfj")]
+
+[node name="Cube_004" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 0.5, 0, 0, 0, 1, -1.9609, 0, -0.420198)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Cube_004" index="0"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cube_004/StaticBody3D" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.95183, 0.497589, 0.374115)
+shape = SubResource("BoxShape3D_sc101")
