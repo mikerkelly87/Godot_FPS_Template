@@ -1,10 +1,12 @@
-[gd_scene load_steps=18 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=20 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
 [ext_resource type="PackedScene" uid="uid://djgxm3mdibqph" path="res://scenes/weapon.tscn" id="2_iiok8"]
 [ext_resource type="Texture2D" uid="uid://doc8ur52owxys" path="res://assets/crosshair_hit.png" id="3_y6qrd"]
 [ext_resource type="PackedScene" uid="uid://c8o5ew5sdyxh6" path="res://scenes/pause_menu.tscn" id="4_0uhqr"]
+[ext_resource type="Texture2D" uid="uid://bodlf352ak4bp" path="res://assets/BlueGunUnselected.png" id="5_swwuq"]
+[ext_resource type="Texture2D" uid="uid://b38kmrulacsvx" path="res://assets/RedGunUnselected.png" id="6_pjra3"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xysup"]
 
@@ -101,7 +103,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 environment = SubResource("Environment_6f0y4")
 
 [node name="WeaponRayCast" type="RayCast3D" parent="Camera3D"]
-target_position = Vector3(0, -1, -100)
+target_position = Vector3(0, -1, -1000)
 collision_mask = 2
 collide_with_areas = true
 debug_shape_thickness = 1
@@ -115,8 +117,10 @@ libraries = {
 transform = Transform3D(0.984808, 0, 0.173648, 0, 1, 0, -0.173648, 0, 0.984808, 0.458509, -0.297806, -0.735071)
 
 [node name="ItemRayCast" type="RayCast3D" parent="Camera3D"]
-target_position = Vector3(0, -1, -2)
+transform = Transform3D(1, 0, 0, 0, 0.832341, -0.554263, 0, 0.554263, 0.832341, 0, 0, 0)
+target_position = Vector3(0, -1, -1.5)
 collision_mask = 4
+collide_with_areas = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0628227, -0.0282702)
@@ -141,6 +145,8 @@ offset_right = 960.0
 offset_bottom = 540.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="StaminaBar" type="ProgressBar" parent="UI/Control"]
 layout_mode = 1
@@ -205,6 +211,33 @@ layout_mode = 2
 texture = ExtResource("3_y6qrd")
 expand_mode = 1
 stretch_mode = 4
+
+[node name="WeaponSelect" type="BoxContainer" parent="UI/Control"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/WeaponSelect"]
+layout_mode = 2
+
+[node name="BlueGun" type="TextureRect" parent="UI/Control/WeaponSelect/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(100, 75)
+layout_mode = 2
+texture = ExtResource("5_swwuq")
+expand_mode = 1
+
+[node name="RedGun" type="TextureRect" parent="UI/Control/WeaponSelect/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(100, 75)
+layout_mode = 2
+texture = ExtResource("6_pjra3")
+expand_mode = 1
 
 [node name="CrosshairTimer" type="Timer" parent="UI"]
 wait_time = 0.1

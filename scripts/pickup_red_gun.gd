@@ -4,25 +4,25 @@ signal display_message(message)
 signal stop_message()
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	pass # Replace with function body.
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(delta: float) -> void:
 	pass
 
 
-func _on_area_3d_body_entered(body):
-	display_message.emit("Press E to pick up Blue Gun")
+func _on_pickup_range_body_entered(body: Node3D) -> void:
+	display_message.emit("Press E to pick up Red Gun")
 
 
-func _on_area_3d_body_exited(body):
+func _on_pickup_range_body_exited(body: Node3D) -> void:
 	stop_message.emit()
 
 
 func _on_player_item_collection_collide(object: Variant) -> void:
 	var my_pickup_range_rid = $Cube/PickupRange.get_rid()
 	if str(object) == str(my_pickup_range_rid):
-		display_message.emit("Press E to pick up Blue Gun")
+		display_message.emit("Press E to pick up Red Gun")
 		#print("Press E to pick up Blue Gun")

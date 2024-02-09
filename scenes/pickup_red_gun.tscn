@@ -1,14 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://bokmkmytedmor"]
+[gd_scene load_steps=5 format=3 uid="uid://bokmkmytedmor"]
 
 [ext_resource type="PackedScene" uid="uid://dweqwsydiwh16" path="res://assets/m1911_red.glb" id="1_i1bi3"]
+[ext_resource type="Script" path="res://scripts/pickup_red_gun.gd" id="2_2ufbc"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hgnxc"]
 size = Vector3(1.16449, 3.28223, 5.0191)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ndhgt"]
-size = Vector3(8.79028, 3.8808, 5.37366)
+size = Vector3(1.41534, 3.8808, 5.37366)
 
 [node name="PickupRedGun" instance=ExtResource("1_i1bi3")]
+script = ExtResource("2_2ufbc")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Cube" index="0"]
 
@@ -21,5 +23,8 @@ collision_layer = 4
 collision_mask = 4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Cube/PickupRange" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.793091, 0.0252991, -0.0465698)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00857547, 0.0252991, -0.0465698)
 shape = SubResource("BoxShape3D_ndhgt")
+
+[connection signal="body_entered" from="Cube/PickupRange" to="." method="_on_pickup_range_body_entered"]
+[connection signal="body_exited" from="Cube/PickupRange" to="." method="_on_pickup_range_body_exited"]

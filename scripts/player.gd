@@ -14,13 +14,25 @@ var can_shoot := true
 var max_health := 100.0
 var health := max_health
 var game_paused = false
-var current_weapon := "BlueGun" # choices: BlueGun, RedGun
+var current_weapon := "" # choices: BlueGun, RedGun
+
+# For debugging
+var inventory_was_printed = false
+
+
+# Inventory dictionary variable
+var inventory := {
+	"BlueGun": {"in_inventory": false, "is_equipped": false, "image": preload("res://assets/BlueGunUnselected.png"), "ammo": 0},
+	"RedGun": {"in_inventory": false, "is_equipped": false, "image": preload("res://assets/RedGunUnselected.png"), "ammo": 0},
+}
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 
 signal deal_damage(object)
+signal item_collection_collide(object)
+
 
 func _ready():
 	# Capture mouse for mouse look
@@ -45,6 +57,11 @@ func _physics_process(delta: float) -> void:
 	shoot()
 	pause_menu()
 	weapon_select()
+	item_pickup()
+	show_weapons()
+	
+	# For debugging
+	print_inventory()
 	
 	# Add the gravity.
 	if not is_on_floor():
@@ -167,11 +184,49 @@ func raycast_debugging() -> void:
 # Function to handle weapon selection. All weapons are attached to the weapon node
 # and are not visible by default unless they are set as the current_weapon.
 func weapon_select():
+	# Handle selecting the first weapon pickup
+	if current_weapon == "":
+		if inventory["BlueGun"].in_inventory == true:
+			current_weapon = "BlueGun"
+			inventory["BlueGun"].is_equipped = true
+		elif inventory["RedGun"].in_inventory == true:
+			current_weapon = "RedGun"
+			inventory["RedGun"].is_equipped = true
 	# Handle weapon selection with number keys
-	if Input.is_action_just_pressed("select_weapon_1"):
-		current_weapon = "BlueGun"
-	if Input.is_action_just_pressed("select_weapon_2"):
-		current_weapon = "RedGun"
+	if inventory["BlueGun"].in_inventory == true:
+		if Input.is_action_just_pressed("select_weapon_1"):
+			current_weapon = "BlueGun"
+			inventory["BlueGun"].is_equipped = true
+			inventory["RedGun"].is_equipped = false
+	if inventory["RedGun"].in_inventory == true:
+		if Input.is_action_just_pressed("select_weapon_2"):
+			current_weapon = "RedGun"
+			inventory["RedGun"].is_equipped = true
+			inventory["BlueGun"].is_equipped = false
+
+	# Handle weapon selection with mouse scroll wheel
+	if Input.is_action_just_pressed("select_weapon_scroll_up"):
+		if current_weapon == "BlueGun":
+			if inventory["RedGun"].in_inventory == true:
+				current_weapon = "RedGun"
+				inventory["RedGun"].is_equipped = true
+				inventory["BlueGun"].is_equipped = false
+		elif current_weapon == "RedGun":
+			if inventory["BlueGun"].in_inventory == true:
+				current_weapon = "BlueGun"
+				inventory["BlueGun"].is_equipped = true
+				inventory["RedGun"].is_equipped = false
+	if Input.is_action_just_pressed("select_weapon_scroll_down"):
+		if current_weapon == "BlueGun":
+			if inventory["RedGun"].in_inventory == true:
+				current_weapon = "RedGun"
+				inventory["RedGun"].is_equipped = true
+				inventory["BlueGun"].is_equipped = false
+		elif current_weapon == "RedGun":
+			if inventory["BlueGun"].in_inventory == true:
+				current_weapon = "BlueGun"
+				inventory["BlueGun"].is_equipped = true
+				inventory["RedGun"].is_equipped = false
 	# Make the current weapon visible
 	if current_weapon == "RedGun":
 		$Camera3D/Weapon/RedGun.visible = true
@@ -229,10 +284,49 @@ func _on_pause_menu_exit_pause_menu():
 	game_paused = false
 
 
+# Handle item pickups
+func item_pickup() -> void:
+	var collided_object_id = $Camera3D/ItemRayCast.get_collider_rid()
+	if $Camera3D/ItemRayCast.is_colliding() == true:
+		item_collection_collide.emit(collided_object_id)
+	elif $Camera3D/ItemRayCast.is_colliding() == false:
+		$UI/Control/message_text.text = ""
+
+
+# Display the weapons in the weapon select images at the top of the screen
+func show_weapons():
+	if inventory["BlueGun"].in_inventory == true:
+		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.visible = true
+	if inventory["RedGun"].in_inventory == true:
+		$UI/Control/WeaponSelect/HBoxContainer/RedGun.visible = true
+	if inventory["BlueGun"].is_equipped == true:
+		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.texture = preload("res://assets/BlueGunSelected.png")
+		$UI/Control/WeaponSelect/HBoxContainer/RedGun.texture = preload("res://assets/RedGunUnselected.png")
+	if inventory["RedGun"].is_equipped == true:
+		$UI/Control/WeaponSelect/HBoxContainer/RedGun.texture = preload("res://assets/RedGunSelected.png")
+		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.texture = preload("res://assets/BlueGunUnselected.png")
+
+
 # Display blue gun pickup text
 func _on_pickup_blue_gun_display_message(message):
 	$UI/Control/message_text.text = message
+	if Input.is_action_just_pressed("pickup_item"):
+		inventory["BlueGun"].in_inventory = true
+		$UI/Control/message_text.text = ""
+		print(inventory)
 
-# Stop displaying blue gun pickup text
-func _on_pickup_blue_gun_stop_message():
-	$UI/Control/message_text.text = ""
+
+# Display red gun pickup text
+func _on_pickup_red_gun_display_message(message: Variant) -> void:
+	$UI/Control/message_text.text = message
+	if Input.is_action_just_pressed("pickup_item"):
+		inventory["RedGun"].in_inventory = true
+		$UI/Control/message_text.text = ""
+		print(inventory)
+
+
+# For debugging
+func print_inventory():
+	if inventory_was_printed == false:
+		print(inventory)
+		inventory_was_printed = true
