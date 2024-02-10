@@ -32,6 +32,8 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 signal deal_damage(object)
 signal item_collection_collide(object)
+signal picked_up_item(object)
+signal dropped_item(object)
 
 
 func _ready():
@@ -59,10 +61,10 @@ func _physics_process(delta: float) -> void:
 	weapon_select()
 	item_pickup()
 	show_weapons()
+	ammo_counter()
+	drop_weapon()
 	
-	# For debugging
-	print_inventory()
-	
+		
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -186,12 +188,17 @@ func raycast_debugging() -> void:
 func weapon_select():
 	# Handle selecting the first weapon pickup
 	if current_weapon == "":
+		if inventory["BlueGun"].in_inventory == false:
+			if inventory["RedGun"].in_inventory == false:
+				$UI/Control/AmmoCount.visible = false
 		if inventory["BlueGun"].in_inventory == true:
 			current_weapon = "BlueGun"
 			inventory["BlueGun"].is_equipped = true
-		elif inventory["RedGun"].in_inventory == true:
+			$UI/Control/AmmoCount.visible = true
+		if inventory["RedGun"].in_inventory == true:
 			current_weapon = "RedGun"
 			inventory["RedGun"].is_equipped = true
+			$UI/Control/AmmoCount.visible = true
 	# Handle weapon selection with number keys
 	if inventory["BlueGun"].in_inventory == true:
 		if Input.is_action_just_pressed("select_weapon_1"):
@@ -234,6 +241,9 @@ func weapon_select():
 	if current_weapon == "BlueGun":
 		$Camera3D/Weapon/RedGun.visible = false
 		$Camera3D/Weapon/BlueGun.visible = true
+	if current_weapon == "":
+		$Camera3D/Weapon/RedGun.visible = false
+		$Camera3D/Weapon/BlueGun.visible = false
 
 # Function to shoot enemies. If the player shoots while the ray cast connects
 # with an enemy Area3D hitbox, then emit the deal_damage signal, passing the 
@@ -243,8 +253,10 @@ func shoot() -> void:
 		if can_shoot == true:
 			if current_weapon == "RedGun":
 				$Camera3D/Weapon/RedGun/AnimationPlayer.play("fire")
+				inventory["RedGun"].ammo -= 1
 			if current_weapon == "BlueGun":
 				$Camera3D/Weapon/BlueGun/AnimationPlayer.play("fire")
+				inventory["BlueGun"].ammo -= 1
 			if $Camera3D/WeaponRayCast.is_colliding() == true:
 				var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
 				deal_damage.emit(collided_object_id)
@@ -297,36 +309,81 @@ func item_pickup() -> void:
 func show_weapons():
 	if inventory["BlueGun"].in_inventory == true:
 		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.visible = true
+	elif inventory["BlueGun"].in_inventory == false:
+		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.visible = false
 	if inventory["RedGun"].in_inventory == true:
 		$UI/Control/WeaponSelect/HBoxContainer/RedGun.visible = true
+	elif inventory["RedGun"].in_inventory == false:
+		$UI/Control/WeaponSelect/HBoxContainer/RedGun.visible = false
 	if inventory["BlueGun"].is_equipped == true:
 		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.texture = preload("res://assets/BlueGunSelected.png")
-		$UI/Control/WeaponSelect/HBoxContainer/RedGun.texture = preload("res://assets/RedGunUnselected.png")
+		if inventory["RedGun"].in_inventory == true:
+			$UI/Control/WeaponSelect/HBoxContainer/RedGun.texture = preload("res://assets/RedGunUnselected.png")
+		if inventory["RedGun"].in_inventory == false:
+			$UI/Control/WeaponSelect/HBoxContainer/RedGun.visible = false
 	if inventory["RedGun"].is_equipped == true:
 		$UI/Control/WeaponSelect/HBoxContainer/RedGun.texture = preload("res://assets/RedGunSelected.png")
-		$UI/Control/WeaponSelect/HBoxContainer/BlueGun.texture = preload("res://assets/BlueGunUnselected.png")
+		if inventory["BlueGun"].in_inventory == true:
+			$UI/Control/WeaponSelect/HBoxContainer/BlueGun.texture = preload("res://assets/BlueGunUnselected.png")
+		if inventory["BlueGun"].in_inventory == false:
+			$UI/Control/WeaponSelect/HBoxContainer/BlueGun.visible = false
 
 
-# Display blue gun pickup text
+# Pick up blue gun
 func _on_pickup_blue_gun_display_message(message):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
 		inventory["BlueGun"].in_inventory = true
+		inventory["BlueGun"].ammo += 10
 		$UI/Control/message_text.text = ""
-		print(inventory)
+		picked_up_item.emit("BlueGun")
 
 
-# Display red gun pickup text
+# Pick up red gun
 func _on_pickup_red_gun_display_message(message: Variant) -> void:
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
 		inventory["RedGun"].in_inventory = true
+		inventory["RedGun"].ammo += 10
 		$UI/Control/message_text.text = ""
-		print(inventory)
+		picked_up_item.emit("RedGun")
 
 
-# For debugging
-func print_inventory():
-	if inventory_was_printed == false:
-		print(inventory)
-		inventory_was_printed = true
+func drop_weapon():
+	if Input.is_action_just_pressed("drop_weapon"):
+		if current_weapon != "":
+			dropped_item.emit(current_weapon)
+			inventory[current_weapon].is_equipped = false
+			inventory[current_weapon].in_inventory = false
+			inventory[current_weapon].ammo = 0
+			if current_weapon == "BlueGun":
+				if inventory["RedGun"].in_inventory == true:
+					current_weapon = "RedGun"
+					inventory["RedGun"].is_equipped = true
+				else:
+					current_weapon = ""
+			if current_weapon == "RedGun":
+				if inventory["BlueGun"].in_inventory == true:
+					current_weapon = "BlueGun"
+					inventory["BlueGun"].is_equipped = true
+				else:
+					current_weapon = ""
+
+
+# Handle ammo counter
+func ammo_counter():
+	if current_weapon == "BlueGun":
+		var blue_ammo = inventory["BlueGun"].ammo
+		$UI/Control/AmmoCount/HBoxContainer/Label2.text = str(blue_ammo)
+		if inventory["BlueGun"].ammo == 0:
+			can_shoot = false
+		elif inventory["BlueGun"].ammo > 0:
+			can_shoot = true
+	if current_weapon == "RedGun":
+		var red_ammo = inventory["RedGun"].ammo
+		$UI/Control/AmmoCount/HBoxContainer/Label2.text = str(red_ammo)
+		if inventory["RedGun"].ammo == 0:
+			can_shoot = false
+		elif inventory["RedGun"].ammo > 0:
+			can_shoot = true
+	#if current_weapon == "RedGun":

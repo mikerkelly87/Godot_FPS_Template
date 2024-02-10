@@ -26,5 +26,10 @@ collision_mask = 4
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0187424, -0.0250627, -0.0372924)
 shape = SubResource("BoxShape3D_cje2b")
 
+[node name="RespawnTimer" type="Timer" parent="." index="16"]
+wait_time = 10.0
+one_shot = true
+
 [connection signal="body_entered" from="Cube/PickupRange" to="." method="_on_area_3d_body_entered"]
 [connection signal="body_exited" from="Cube/PickupRange" to="." method="_on_area_3d_body_exited"]
+[connection signal="timeout" from="RespawnTimer" to="." method="_on_respawn_timer_timeout"]

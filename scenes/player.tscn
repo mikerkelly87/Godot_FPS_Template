@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bevugdkcaxjr3"]
+[gd_scene load_steps=22 format=3 uid="uid://bevugdkcaxjr3"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_7mmla"]
 [ext_resource type="Texture2D" uid="uid://cre0ubgq4nu6h" path="res://assets/crosshair_main.png" id="2_7e26f"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://c8o5ew5sdyxh6" path="res://scenes/pause_menu.tscn" id="4_0uhqr"]
 [ext_resource type="Texture2D" uid="uid://bodlf352ak4bp" path="res://assets/BlueGunUnselected.png" id="5_swwuq"]
 [ext_resource type="Texture2D" uid="uid://b38kmrulacsvx" path="res://assets/RedGunUnselected.png" id="6_pjra3"]
+[ext_resource type="Texture2D" uid="uid://dku76pyfjeqfd" path="res://assets/bullets_I_made.png" id="7_u82vs"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xysup"]
 
@@ -88,6 +89,9 @@ bg_color = Color(0.196078, 0.945098, 0.270588, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_30j06"]
 font_size = 60
+
+[sub_resource type="LabelSettings" id="LabelSettings_vpxbo"]
+font_size = 40
 
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.01527, 0)
@@ -238,6 +242,38 @@ custom_minimum_size = Vector2(100, 75)
 layout_mode = 2
 texture = ExtResource("6_pjra3")
 expand_mode = 1
+
+[node name="AmmoCount" type="BoxContainer" parent="UI/Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Control/AmmoCount"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="UI/Control/AmmoCount/HBoxContainer"]
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 2
+texture = ExtResource("7_u82vs")
+expand_mode = 1
+
+[node name="Label" type="Label" parent="UI/Control/AmmoCount/HBoxContainer"]
+layout_mode = 2
+text = "X"
+label_settings = SubResource("LabelSettings_vpxbo")
+
+[node name="Label2" type="Label" parent="UI/Control/AmmoCount/HBoxContainer"]
+layout_mode = 2
+text = "0"
+label_settings = SubResource("LabelSettings_vpxbo")
 
 [node name="CrosshairTimer" type="Timer" parent="UI"]
 wait_time = 0.1

@@ -26,3 +26,15 @@ func _on_player_item_collection_collide(object: Variant) -> void:
 	if str(object) == str(my_pickup_range_rid):
 		display_message.emit("Press E to pick up Red Gun")
 		#print("Press E to pick up Blue Gun")
+
+
+func _on_player_picked_up_item(object: Variant) -> void:
+	if object == "RedGun":
+		self.visible = false
+		$Cube/PickupRange/CollisionShape3D.disabled = true
+		$RespawnTimer.start()
+
+
+func _on_respawn_timer_timeout() -> void:
+	self.visible = true
+	$Cube/PickupRange/CollisionShape3D.disabled = false

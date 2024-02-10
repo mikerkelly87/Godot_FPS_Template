@@ -113,5 +113,7 @@ transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 37.957
 [connection signal="deal_damage" from="Player" to="Enemy2" method="_on_player_deal_damage"]
 [connection signal="item_collection_collide" from="Player" to="PickupBlueGun" method="_on_player_item_collection_collide"]
 [connection signal="item_collection_collide" from="Player" to="PickupRedGun" method="_on_player_item_collection_collide"]
+[connection signal="picked_up_item" from="Player" to="PickupBlueGun" method="_on_player_picked_up_item"]
+[connection signal="picked_up_item" from="Player" to="PickupRedGun" method="_on_player_picked_up_item"]
 [connection signal="display_message" from="PickupBlueGun" to="Player" method="_on_pickup_blue_gun_display_message"]
 [connection signal="display_message" from="PickupRedGun" to="Player" method="_on_pickup_red_gun_display_message"]
