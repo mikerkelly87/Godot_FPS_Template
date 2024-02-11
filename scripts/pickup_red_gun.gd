@@ -38,3 +38,14 @@ func _on_player_picked_up_item(object: Variant) -> void:
 func _on_respawn_timer_timeout() -> void:
 	self.visible = true
 	$Cube/PickupRange/CollisionShape3D.disabled = false
+
+
+# This function will be called from the Main scene when the player drops the gun
+func initialize(player_position, player):
+	rotate_z(80)
+	position.x = player_position.x
+	position.z = player_position.z
+	position.y = 0
+	var player_node = player
+	player.item_collection_collide.connect(_on_player_item_collection_collide)
+	player.picked_up_item.connect(_on_player_picked_up_item)

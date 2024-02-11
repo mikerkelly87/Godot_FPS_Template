@@ -387,3 +387,7 @@ func ammo_counter():
 		elif inventory["RedGun"].ammo > 0:
 			can_shoot = true
 	#if current_weapon == "RedGun":
+
+
+func connect_signals(item_scene):
+	item_scene.display_message.connect(_on_pickup_blue_gun_display_message)
