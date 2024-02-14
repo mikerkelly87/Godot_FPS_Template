@@ -10,11 +10,13 @@ var crouch_speed := 2.0
 var can_sprint := true
 var is_sprinting := false
 var can_shoot := true
+var shoot_colldown := false
 #var mouse_sensitivity := 0.001
 var max_health := 100.0
 var health := max_health
 var game_paused = false
 var current_weapon := "" # choices: BlueGun, RedGun
+var is_dead := false
 
 # For debugging
 var inventory_was_printed = false
@@ -39,10 +41,6 @@ signal dropped_item(object, ammo)
 func _ready():
 	# Capture mouse for mouse look
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	
-	# This is only here because at this time I can't figure out why the m1911
-	# instance starts itself off at the middle keyframe of the fire animation
-	#$Camera3D/m1911/AnimationPlayer.play("fire")
 
 
 # Handle mouse look
@@ -63,6 +61,7 @@ func _physics_process(delta: float) -> void:
 	show_weapons()
 	ammo_counter()
 	drop_weapon()
+	player_death()
 	
 		
 	# Add the gravity.
@@ -73,54 +72,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = jump_velocity
 	
-	# Handle sprint input.
-	if can_sprint == true:
-		if Input.is_action_just_pressed("sprint"):
-			$Camera3D/AnimationPlayer.play("sprint")
-			#$Camera3D/m1911/AnimationPlayer.play("lower")
-			$SprintRecharge.stop()
-			is_sprinting = true
-			can_shoot = false
-			speed = sprint_speed
-			stamina -= 10.0
-			$SprintCooldown.start()
-		elif Input.is_action_just_released("sprint"):
-			$Camera3D/AnimationPlayer.stop()
-			#$Camera3D/m1911/AnimationPlayer.play("raise")
-			is_sprinting = false
-			can_shoot = true
-			speed = BASE_SPEED
-			$SprintCooldown.stop()
-			$SprintRecharge.start()
-	elif can_sprint == false:
-		if Input.is_action_pressed("sprint"):
-			$Camera3D/AnimationPlayer.play("walk")
-			#$Camera3D/m1911/AnimationPlayer.play("raise")
-			can_shoot = true
-			speed = BASE_SPEED
-		if Input.is_action_just_released("sprint"):
-			$Camera3D/AnimationPlayer.stop()
-			#$Camera3D/m1911/AnimationPlayer.play("raise")
-			is_sprinting = false
-			can_shoot = true
-			speed = BASE_SPEED
-			$SprintCooldown.stop()
-			$SprintRecharge.start()
-
-	# Handle crouch by lowering camera position
-	if Input.is_action_pressed("crouch"):
-		can_sprint = false
-		$Camera3D.position.y = 0.0
-		speed = crouch_speed
-	elif Input.is_action_just_released("crouch"):
-		$Camera3D.position.y = 0.5
-		speed = BASE_SPEED
-		can_sprint = true
-		
-	# Set value of health bar
-	$UI/Control/HealthBar.value = health
-
-	# Get the input direction and handle the movement/deceleration.
+		# Get the input direction and handle the movement/deceleration.
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
@@ -129,10 +81,57 @@ func _physics_process(delta: float) -> void:
 		velocity.z = direction.z * speed
 	else:
 		$Camera3D/AnimationPlayer.stop()
+		$Camera3D/AnimationPlayer.clear_queue()
 		velocity.x = move_toward(velocity.x, 0, speed)
 		velocity.z = move_toward(velocity.z, 0, speed)
 
 	move_and_slide()
+	
+	# Handle sprint input.
+	if can_sprint == true:
+		if Input.is_action_just_pressed("sprint"):
+			if direction:
+				$Camera3D/AnimationPlayer.play("sprint")
+				$SprintRecharge.stop()
+				is_sprinting = true
+				can_shoot = false
+				speed = sprint_speed
+				stamina -= 10.0
+				$SprintCooldown.start()
+		elif Input.is_action_just_released("sprint"):
+			$Camera3D/AnimationPlayer.stop()
+			is_sprinting = false
+			can_shoot = true
+			speed = BASE_SPEED
+			$SprintCooldown.stop()
+			$SprintRecharge.start()
+	elif can_sprint == false:
+		if Input.is_action_pressed("sprint"):
+			$Camera3D/AnimationPlayer.play("walk")
+			can_shoot = true
+			speed = BASE_SPEED
+		if Input.is_action_just_released("sprint"):
+			$Camera3D/AnimationPlayer.stop()
+			is_sprinting = false
+			can_shoot = true
+			speed = BASE_SPEED
+			$SprintCooldown.stop()
+			$SprintRecharge.start()
+
+	# Handle crouch (currently this does not work correctly)
+	if Input.is_action_pressed("crouch"):
+		$Camera3D/AnimationPlayer.play("crouch")
+		can_sprint = false
+		speed = crouch_speed
+	elif Input.is_action_just_released("crouch"):
+		$Camera3D/AnimationPlayer.play("stand")
+		speed = BASE_SPEED
+		can_sprint = true
+		
+	# Set value of health bar
+	$UI/Control/HealthBar.value = health
+
+
 
 
 # Every second while sprinting, remove 10 stamina
@@ -250,24 +249,38 @@ func weapon_select():
 # ID of the object that was shot.
 func shoot() -> void:
 	if Input.is_action_just_pressed("shoot"):
+		if current_weapon == "":
+			can_shoot = false
 		if can_shoot == true:
 			can_shoot = false
 			if current_weapon == "RedGun":
 				$Camera3D/Weapon/RedGun/AnimationPlayer.play("fire")
-				inventory["RedGun"].ammo -= 1
-				$ShootCooldown.start()
+				if shoot_colldown == false:
+					inventory["RedGun"].ammo -= 1
+					shoot_colldown = true
+					$ShootCooldown.start()
+					if $Camera3D/WeaponRayCast.is_colliding() == true:
+						var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
+						deal_damage.emit(collided_object_id)
+						$UI/Control/CenterContainer/CrosshairMain.visible = false
+						$UI/Control/CenterContainer/CrosshairHit.visible = true
+						$UI/CrosshairTimer.start()
+					elif $Camera3D/WeaponRayCast.is_colliding() == false:
+						pass
 			if current_weapon == "BlueGun":
 				$Camera3D/Weapon/BlueGun/AnimationPlayer.play("fire")
-				inventory["BlueGun"].ammo -= 1
-				$ShootCooldown.start()
-			if $Camera3D/WeaponRayCast.is_colliding() == true:
-				var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
-				deal_damage.emit(collided_object_id)
-				$UI/Control/CenterContainer/CrosshairMain.visible = false
-				$UI/Control/CenterContainer/CrosshairHit.visible = true
-				$UI/CrosshairTimer.start()
-			elif $Camera3D/WeaponRayCast.is_colliding() == false:
-				pass
+				if shoot_colldown == false:
+					inventory["BlueGun"].ammo -= 1
+					shoot_colldown = true
+					$ShootCooldown.start()
+					if $Camera3D/WeaponRayCast.is_colliding() == true:
+						var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
+						deal_damage.emit(collided_object_id)
+						$UI/Control/CenterContainer/CrosshairMain.visible = false
+						$UI/Control/CenterContainer/CrosshairHit.visible = true
+						$UI/CrosshairTimer.start()
+					elif $Camera3D/WeaponRayCast.is_colliding() == false:
+						pass
 
 
 # Set the player's crosshair back to normal after landing a hit.
@@ -283,11 +296,13 @@ func pause_menu():
 			$UI/Control.visible = false
 			$PauseMenu/PauseControl.visible = true
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			get_tree().paused = true
 			game_paused = true
 		elif game_paused == true:
 			$UI/Control.visible = true
 			$PauseMenu/PauseControl.visible = false
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			get_tree().paused = false
 			game_paused = false
 
 
@@ -296,6 +311,7 @@ func _on_pause_menu_exit_pause_menu():
 	$PauseMenu/PauseControl.visible = false
 	$UI/Control.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	get_tree().paused = false
 	game_paused = false
 
 
@@ -402,5 +418,34 @@ func connect_signals(item_scene):
 		item_scene.display_message.connect(_on_pickup_red_gun_display_message)
 
 
+# Shoot cooldown timer
 func _on_shoot_cooldown_timeout():
-	can_shoot = true
+	shoot_colldown = false
+
+
+# Function to handle player death
+func player_death():
+	if health < 0:
+		health = 0
+	if health == 0:
+		$UI/Control.visible = false
+		$DeathMenu/DeathControl.visible = true
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		game_paused = true
+		get_tree().paused = true
+
+
+func _on_enemy_deal_damage(damage_amount: Variant) -> void:
+	health -= damage_amount
+	$UI/DamageControl.visible = true
+	$DamageScreenCooldown.start()
+
+
+func _on_enemy_2_deal_damage(damage_amount: Variant) -> void:
+	health -= damage_amount
+	$UI/DamageControl.visible = true
+	$DamageScreenCooldown.start()
+
+
+func _on_damage_screen_cooldown_timeout() -> void:
+	$UI/DamageControl.visible = false

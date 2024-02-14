@@ -14,6 +14,10 @@ func _on_settings_button_pressed():
 	$SettingsControl.visible = true
 
 
+# Handle click on restart button
+func _on_restart_button_pressed() -> void:
+	get_tree().reload_current_scene()
+
 # Update mouse sensitivity after the player drags the slider
 func _on_h_slider_drag_ended(value_changed):
 	GameVars.mouse_sensitivity = $SettingsControl/CenterContainer/BoxContainer/VBoxContainer/ColorRect2/HSlider.value
@@ -30,3 +34,6 @@ func _on_back_button_pressed():
 
 func _on_resume_button_pressed():
 	exit_pause_menu.emit()
+
+
+

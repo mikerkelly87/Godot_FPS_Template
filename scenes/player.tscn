@@ -8,18 +8,9 @@
 [ext_resource type="Texture2D" uid="uid://bodlf352ak4bp" path="res://assets/BlueGunUnselected.png" id="5_swwuq"]
 [ext_resource type="Texture2D" uid="uid://b38kmrulacsvx" path="res://assets/RedGunUnselected.png" id="6_pjra3"]
 [ext_resource type="Texture2D" uid="uid://dku76pyfjeqfd" path="res://assets/bullets_I_made.png" id="7_u82vs"]
+[ext_resource type="PackedScene" uid="uid://d0ukre6k25raj" path="res://scenes/death_menu.tscn" id="9_q0v8v"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_xysup"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_83pgw"]
-
-[sub_resource type="Sky" id="Sky_3tf62"]
-sky_material = SubResource("ShaderMaterial_83pgw")
-
-[sub_resource type="Environment" id="Environment_6f0y4"]
-background_mode = 1
-background_color = Color(0.647059, 0.764706, 1, 1)
-sky = SubResource("Sky_3tf62")
 
 [sub_resource type="Animation" id="Animation_wwl2q"]
 length = 0.001
@@ -50,12 +41,12 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(0, 0.5, 0), Vector3(0, -0.080057, 0), Vector3(0, 0.08, 0)]
+"values": [Vector3(0, 0.5, 0), Vector3(0, 0.25, 0), Vector3(0, 0.5, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_djthn"]
 resource_name = "walk"
-length = 0.5
+length = 0.4
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -64,16 +55,50 @@ tracks/0/path = NodePath(".:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0.2, 0.5),
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0, 0.5, 0), Vector3(0, 0.25, 0), Vector3(0, 0.5, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_mvdfe"]
+resource_name = "crouch"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0, -0.08, 0), Vector3(0, 0.08, 0)]
+"values": [Vector3(0, 0.5, 0), Vector3(0, -0.5, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_g0lau"]
+resource_name = "stand"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, -0.5, 0), Vector3(0, 0.5, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ion17"]
 _data = {
 "RESET": SubResource("Animation_wwl2q"),
+"crouch": SubResource("Animation_mvdfe"),
 "sprint": SubResource("Animation_ekc64"),
+"stand": SubResource("Animation_g0lau"),
 "walk": SubResource("Animation_djthn")
 }
 
@@ -104,7 +129,6 @@ mesh = SubResource("CapsuleMesh_xysup")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-environment = SubResource("Environment_6f0y4")
 
 [node name="WeaponRayCast" type="RayCast3D" parent="Camera3D"]
 target_position = Vector3(0, -1, -1000)
@@ -279,9 +303,48 @@ label_settings = SubResource("LabelSettings_vpxbo")
 wait_time = 0.1
 one_shot = true
 
+[node name="DamageControl" type="Control" parent="UI"]
+visible = false
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/DamageControl"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UI/DamageControl/CenterContainer"]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 2
+color = Color(0.768627, 0, 0.2, 0.396078)
+
 [node name="PauseMenu" parent="." instance=ExtResource("4_0uhqr")]
+process_mode = 3
 
 [node name="ShootCooldown" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
+[node name="DeathMenu" parent="." instance=ExtResource("9_q0v8v")]
+process_mode = 3
+
+[node name="DamageScreenCooldown" type="Timer" parent="."]
 wait_time = 0.2
 one_shot = true
 
@@ -290,3 +353,4 @@ one_shot = true
 [connection signal="timeout" from="UI/CrosshairTimer" to="." method="_on_crosshair_timer_timeout"]
 [connection signal="exit_pause_menu" from="PauseMenu" to="." method="_on_pause_menu_exit_pause_menu"]
 [connection signal="timeout" from="ShootCooldown" to="." method="_on_shoot_cooldown_timeout"]
+[connection signal="timeout" from="DamageScreenCooldown" to="." method="_on_damage_screen_cooldown_timeout"]
