@@ -27,7 +27,6 @@ size = Vector3(100.143, 1, 100.531)
 script = ExtResource("1_uxm1k")
 blue_gun_scene = ExtResource("5_cilem")
 red_gun_scene = ExtResource("6_ow560")
-player_scene = ExtResource("2_opkle")
 
 [node name="Wall01" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.00343, -44.8188)

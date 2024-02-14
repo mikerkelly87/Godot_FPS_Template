@@ -33,7 +33,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 signal deal_damage(object)
 signal item_collection_collide(object)
 signal picked_up_item(object)
-signal dropped_item(object)
+signal dropped_item(object, ammo)
 
 
 func _ready():
@@ -251,12 +251,15 @@ func weapon_select():
 func shoot() -> void:
 	if Input.is_action_just_pressed("shoot"):
 		if can_shoot == true:
+			can_shoot = false
 			if current_weapon == "RedGun":
 				$Camera3D/Weapon/RedGun/AnimationPlayer.play("fire")
 				inventory["RedGun"].ammo -= 1
+				$ShootCooldown.start()
 			if current_weapon == "BlueGun":
 				$Camera3D/Weapon/BlueGun/AnimationPlayer.play("fire")
 				inventory["BlueGun"].ammo -= 1
+				$ShootCooldown.start()
 			if $Camera3D/WeaponRayCast.is_colliding() == true:
 				var collided_object_id = $Camera3D/WeaponRayCast.get_collider_rid()
 				deal_damage.emit(collided_object_id)
@@ -330,29 +333,30 @@ func show_weapons():
 
 
 # Pick up blue gun
-func _on_pickup_blue_gun_display_message(message):
+func _on_pickup_blue_gun_display_message(message, ammo):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
 		inventory["BlueGun"].in_inventory = true
-		inventory["BlueGun"].ammo += 10
+		inventory["BlueGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
 		picked_up_item.emit("BlueGun")
 
 
 # Pick up red gun
-func _on_pickup_red_gun_display_message(message: Variant) -> void:
+func _on_pickup_red_gun_display_message(message, ammo):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
 		inventory["RedGun"].in_inventory = true
-		inventory["RedGun"].ammo += 10
+		inventory["RedGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
 		picked_up_item.emit("RedGun")
 
 
+# Drop the currently equipped weapon
 func drop_weapon():
 	if Input.is_action_just_pressed("drop_weapon"):
 		if current_weapon != "":
-			dropped_item.emit(current_weapon)
+			dropped_item.emit(current_weapon, inventory[current_weapon].ammo)
 			inventory[current_weapon].is_equipped = false
 			inventory[current_weapon].in_inventory = false
 			inventory[current_weapon].ammo = 0
@@ -386,8 +390,17 @@ func ammo_counter():
 			can_shoot = false
 		elif inventory["RedGun"].ammo > 0:
 			can_shoot = true
-	#if current_weapon == "RedGun":
 
 
+# Function used to connect signals from weapon scripts when a new weapon is
+# instantiated in the main scene
 func connect_signals(item_scene):
-	item_scene.display_message.connect(_on_pickup_blue_gun_display_message)
+	print("item_scene is ", item_scene)
+	if "PickupBlueGun" in str(item_scene):
+		item_scene.display_message.connect(_on_pickup_blue_gun_display_message)
+	if "PickupRedGun" in str(item_scene):
+		item_scene.display_message.connect(_on_pickup_red_gun_display_message)
+
+
+func _on_shoot_cooldown_timeout():
+	can_shoot = true

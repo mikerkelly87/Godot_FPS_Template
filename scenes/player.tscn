@@ -281,7 +281,12 @@ one_shot = true
 
 [node name="PauseMenu" parent="." instance=ExtResource("4_0uhqr")]
 
+[node name="ShootCooldown" type="Timer" parent="."]
+wait_time = 0.2
+one_shot = true
+
 [connection signal="timeout" from="SprintCooldown" to="." method="_on_sprint_cooldown_timeout"]
 [connection signal="timeout" from="SprintRecharge" to="." method="_on_sprint_recharge_timeout"]
 [connection signal="timeout" from="UI/CrosshairTimer" to="." method="_on_crosshair_timer_timeout"]
 [connection signal="exit_pause_menu" from="PauseMenu" to="." method="_on_pause_menu_exit_pause_menu"]
+[connection signal="timeout" from="ShootCooldown" to="." method="_on_shoot_cooldown_timeout"]
