@@ -7,6 +7,8 @@ var sprint_speed := 20.0
 var max_stamina := 50.0
 var stamina := max_stamina
 var crouch_speed := 2.0
+var is_crouching := false
+var standing_up := false
 var can_sprint := true
 var is_sprinting := false
 var can_shoot := true
@@ -62,8 +64,8 @@ func _physics_process(delta: float) -> void:
 	ammo_counter()
 	drop_weapon()
 	player_death()
-	
-		
+
+
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -77,6 +79,13 @@ func _physics_process(delta: float) -> void:
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
 		$Camera3D/AnimationPlayer.play("walk")
+		# Don't head bob while jumping
+		if ! is_on_floor():
+			$Camera3D/AnimationPlayer.stop()
+			$Camera3D/AnimationPlayer.clear_queue()
+		if is_crouching == true:
+			$Camera3D/AnimationPlayer.stop()
+			$Camera3D/AnimationPlayer.clear_queue()
 		velocity.x = direction.x * speed
 		velocity.z = direction.z * speed
 	else:
@@ -120,18 +129,17 @@ func _physics_process(delta: float) -> void:
 
 	# Handle crouch (currently this does not work correctly)
 	if Input.is_action_pressed("crouch"):
-		$Camera3D/AnimationPlayer.play("crouch")
-		can_sprint = false
+		$Camera3D.position.y = -0.5
+		is_crouching = true
 		speed = crouch_speed
-	elif Input.is_action_just_released("crouch"):
-		$Camera3D/AnimationPlayer.play("stand")
+	if Input.is_action_just_released("crouch"):
+		$Camera3D.position.y = 0.5
+		is_crouching = false
 		speed = BASE_SPEED
-		can_sprint = true
-		
+
+
 	# Set value of health bar
 	$UI/Control/HealthBar.value = health
-
-
 
 
 # Every second while sprinting, remove 10 stamina

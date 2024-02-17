@@ -16,6 +16,7 @@ func _on_settings_button_pressed():
 
 # Handle click on restart button
 func _on_restart_button_pressed() -> void:
+	get_tree().paused = false
 	get_tree().reload_current_scene()
 
 # Update mouse sensitivity after the player drags the slider
