@@ -33,6 +33,7 @@ func _on_player_deal_damage(object: Variant) -> void:
 	var my_rid = get_rid()
 	if str(object) == str(my_hitbox_rid):
 		print("The enemy says you shot me, partner")
+		$TakeDamageSound.play()
 		health -= 5
 		print("This enemy's health is ", health)
 

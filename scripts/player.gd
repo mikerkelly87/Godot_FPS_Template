@@ -36,7 +36,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 signal deal_damage(object)
 signal item_collection_collide(object)
-signal picked_up_item(object)
+signal picked_up_item(object, location)
 signal dropped_item(object, ammo)
 
 
@@ -129,6 +129,7 @@ func _physics_process(delta: float) -> void:
 
 	# Handle crouch (currently this does not work correctly)
 	if Input.is_action_pressed("crouch"):
+		print(self.position.y)
 		$Camera3D.position.y = -0.5
 		is_crouching = true
 		speed = crouch_speed
@@ -140,6 +141,10 @@ func _physics_process(delta: float) -> void:
 
 	# Set value of health bar
 	$UI/Control/HealthBar.value = health
+
+	# Play background sound
+	if $BackgroundSound.playing == false:
+		$BackgroundSound.play()
 
 
 # Every second while sprinting, remove 10 stamina
@@ -200,21 +205,25 @@ func weapon_select():
 				$UI/Control/AmmoCount.visible = false
 		if inventory["BlueGun"].in_inventory == true:
 			current_weapon = "BlueGun"
+			$GunEquip.play()
 			inventory["BlueGun"].is_equipped = true
 			$UI/Control/AmmoCount.visible = true
 		if inventory["RedGun"].in_inventory == true:
 			current_weapon = "RedGun"
+			$GunEquip.play()
 			inventory["RedGun"].is_equipped = true
 			$UI/Control/AmmoCount.visible = true
 	# Handle weapon selection with number keys
 	if inventory["BlueGun"].in_inventory == true:
 		if Input.is_action_just_pressed("select_weapon_1"):
 			current_weapon = "BlueGun"
+			$GunEquip.play()
 			inventory["BlueGun"].is_equipped = true
 			inventory["RedGun"].is_equipped = false
 	if inventory["RedGun"].in_inventory == true:
 		if Input.is_action_just_pressed("select_weapon_2"):
 			current_weapon = "RedGun"
+			$GunEquip.play()
 			inventory["RedGun"].is_equipped = true
 			inventory["BlueGun"].is_equipped = false
 
@@ -223,22 +232,26 @@ func weapon_select():
 		if current_weapon == "BlueGun":
 			if inventory["RedGun"].in_inventory == true:
 				current_weapon = "RedGun"
+				$GunEquip.play()
 				inventory["RedGun"].is_equipped = true
 				inventory["BlueGun"].is_equipped = false
 		elif current_weapon == "RedGun":
 			if inventory["BlueGun"].in_inventory == true:
 				current_weapon = "BlueGun"
+				$GunEquip.play()
 				inventory["BlueGun"].is_equipped = true
 				inventory["RedGun"].is_equipped = false
 	if Input.is_action_just_pressed("select_weapon_scroll_down"):
 		if current_weapon == "BlueGun":
 			if inventory["RedGun"].in_inventory == true:
 				current_weapon = "RedGun"
+				$GunEquip.play()
 				inventory["RedGun"].is_equipped = true
 				inventory["BlueGun"].is_equipped = false
 		elif current_weapon == "RedGun":
 			if inventory["BlueGun"].in_inventory == true:
 				current_weapon = "BlueGun"
+				$GunEquip.play()
 				inventory["BlueGun"].is_equipped = true
 				inventory["RedGun"].is_equipped = false
 	# Make the current weapon visible
@@ -265,6 +278,7 @@ func shoot() -> void:
 				$Camera3D/Weapon/RedGun/AnimationPlayer.play("fire")
 				if shoot_colldown == false:
 					inventory["RedGun"].ammo -= 1
+					$GunShotAudio.play()
 					shoot_colldown = true
 					$ShootCooldown.start()
 					if $Camera3D/WeaponRayCast.is_colliding() == true:
@@ -279,6 +293,7 @@ func shoot() -> void:
 				$Camera3D/Weapon/BlueGun/AnimationPlayer.play("fire")
 				if shoot_colldown == false:
 					inventory["BlueGun"].ammo -= 1
+					$GunShotAudio.play()
 					shoot_colldown = true
 					$ShootCooldown.start()
 					if $Camera3D/WeaponRayCast.is_colliding() == true:
@@ -357,19 +372,24 @@ func show_weapons():
 
 
 # Pick up blue gun
-func _on_pickup_blue_gun_display_message(message, ammo):
+func _on_pickup_blue_gun_display_message(message, ammo, y_position):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
+		$GunEquip.play()
 		inventory["BlueGun"].in_inventory = true
 		inventory["BlueGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
-		picked_up_item.emit("BlueGun")
+		if y_position == 0:
+			picked_up_item.emit("BlueGun", "ground")
+		elif y_position != 0:
+			picked_up_item.emit("BlueGun", "table")
 
 
 # Pick up red gun
 func _on_pickup_red_gun_display_message(message, ammo):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
+		$GunEquip.play()
 		inventory["RedGun"].in_inventory = true
 		inventory["RedGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
@@ -384,6 +404,7 @@ func drop_weapon():
 			inventory[current_weapon].is_equipped = false
 			inventory[current_weapon].in_inventory = false
 			inventory[current_weapon].ammo = 0
+			$DropGunSound.play()
 			if current_weapon == "BlueGun":
 				if inventory["RedGun"].in_inventory == true:
 					current_weapon = "RedGun"
@@ -446,12 +467,14 @@ func player_death():
 func _on_enemy_deal_damage(damage_amount: Variant) -> void:
 	health -= damage_amount
 	$UI/DamageControl.visible = true
+	$TakeDamageSound.play()
 	$DamageScreenCooldown.start()
 
 
 func _on_enemy_2_deal_damage(damage_amount: Variant) -> void:
 	health -= damage_amount
 	$UI/DamageControl.visible = true
+	$TakeDamageSound.play()
 	$DamageScreenCooldown.start()
 
 

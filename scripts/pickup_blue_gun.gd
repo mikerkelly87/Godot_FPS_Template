@@ -16,6 +16,13 @@ func _process(delta):
 	pass
 
 
+# Make any instance on the floor disappear after 3 seconds
+func gun_disappear():
+	if self.position.y == 0:
+		print("Disappear timer started")
+		$DisappearTimer.start()
+
+
 func _on_area_3d_body_entered(body):
 	display_message.emit("Press E to pick up Blue Gun")
 
@@ -27,16 +34,22 @@ func _on_area_3d_body_exited(body):
 func _on_player_item_collection_collide(object: Variant) -> void:
 	var my_pickup_range_rid = $Cube/PickupRange.get_rid()
 	if str(object) == str(my_pickup_range_rid):
-		display_message.emit("Press E to pick up Blue Gun", ammo_count)
+		display_message.emit("Press E to pick up Blue Gun", ammo_count, self.position.y)
 		#print("Press E to pick up Blue Gun")
 
 
-func _on_player_picked_up_item(object: Variant) -> void:
-	if object == "BlueGun":
-		self.visible = false
-		$Cube/PickupRange/CollisionShape3D.disabled = true
-		if respawn == true:
+func _on_player_picked_up_item(object, location):
+	# If the gun is not on the ground, respawn it
+	if self.position.y != 0:
+		if object == "BlueGun" && location == "table":
+			self.visible = false
+			$Cube/PickupRange/CollisionShape3D.disabled = true
 			$RespawnTimer.start()
+	# If the gun is on the ground, don't respawn it
+	elif self.position.y == 0:
+		if object == "BlueGun" && location == "ground":
+			self.visible = false
+			$Cube/PickupRange/CollisionShape3D.disabled = true
 
 
 func _on_respawn_timer_timeout() -> void:
@@ -46,7 +59,7 @@ func _on_respawn_timer_timeout() -> void:
 
 # This function will be called from the Main scene when the player drops the gun
 func initialize(player_position, player, current_ammo):
-	respawn = false
+	#respawn = false
 	rotate_z(80)
 	position.x = player_position.x
 	position.z = player_position.z
@@ -55,3 +68,10 @@ func initialize(player_position, player, current_ammo):
 	player.item_collection_collide.connect(_on_player_item_collection_collide)
 	player.picked_up_item.connect(_on_player_picked_up_item)
 	ammo_count = current_ammo
+	gun_disappear()
+
+
+func _on_disappear_timer_timeout():
+	print("Disappear timer timed out")
+	self.visible = false
+	$Cube/PickupRange/CollisionShape3D.disabled = true

@@ -32,11 +32,16 @@ func _on_player_item_collection_collide(object: Variant) -> void:
 
 
 func _on_player_picked_up_item(object: Variant) -> void:
-	if object == "RedGun":
-		self.visible = false
-		$Cube/PickupRange/CollisionShape3D.disabled = true
-		if respawn == true:
+	# If the gun is not on the ground, respawn it
+	if self.position.y != 0:
+		if object == "RedGun":
+			self.visible = false
+			$Cube/PickupRange/CollisionShape3D.disabled = true
 			$RespawnTimer.start()
+	elif self.position.y == 0:
+		if object == "RedGun":
+			self.visible = false
+			$Cube/PickupRange/CollisionShape3D.disabled = true
 
 
 func _on_respawn_timer_timeout() -> void:
@@ -46,7 +51,7 @@ func _on_respawn_timer_timeout() -> void:
 
 # This function will be called from the Main scene when the player drops the gun
 func initialize(player_position, player, current_ammo):
-	respawn = false
+	#respawn = false
 	rotate_z(80)
 	position.x = player_position.x
 	position.z = player_position.z

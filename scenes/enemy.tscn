@@ -1,6 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://dt50c7iqiaws2"]
+[gd_scene load_steps=9 format=3 uid="uid://dt50c7iqiaws2"]
 
 [ext_resource type="Script" path="res://scripts/enemy.gd" id="1_1mpdt"]
+[ext_resource type="AudioStream" uid="uid://shvyoc3f7pxc" path="res://assets/sounds/deal_damag.mp3" id="2_4a3hb"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mxpd6"]
 albedo_color = Color(1, 0.254902, 0, 1)
@@ -53,6 +54,10 @@ shape = SubResource("CylinderShape3D_ky7rc")
 [node name="DamageCooldownTimer" type="Timer" parent="."]
 wait_time = 2.0
 one_shot = true
+
+[node name="TakeDamageSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_4a3hb")
+volume_db = 24.0
 
 [connection signal="body_entered" from="PlayerDetectionArea" to="." method="_on_player_detection_area_body_entered"]
 [connection signal="body_exited" from="PlayerDetectionArea" to="." method="_on_player_detection_area_body_exited"]
