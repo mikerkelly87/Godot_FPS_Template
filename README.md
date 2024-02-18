@@ -49,7 +49,7 @@ To give a better explanation, when you first pickup a weapon from the table it w
 The animated demo below shows the player drop a weapon with an ammo count of 18.
 Then the player picks up a new weapon from the table with an ammo count of 10.
 Then the player picks back up the weapon on the ground (which had an ammo count of 18).
-This results in a new ammo count of 28.
+The result isin a new ammo count of 28.
 ![Pickup dropped](gifs/Godot_FPS_pickup_dropped_weapon.gif)
 
 
