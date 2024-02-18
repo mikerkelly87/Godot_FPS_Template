@@ -36,7 +36,7 @@ var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 signal deal_damage(object)
 signal item_collection_collide(object)
-signal picked_up_item(object, location)
+signal picked_up_item(object)
 signal dropped_item(object, ammo)
 
 
@@ -372,17 +372,16 @@ func show_weapons():
 
 
 # Pick up blue gun
-func _on_pickup_blue_gun_display_message(message, ammo, y_position):
+func _on_pickup_blue_gun_display_message(message, ammo):
 	$UI/Control/message_text.text = message
 	if Input.is_action_just_pressed("pickup_item"):
 		$GunEquip.play()
 		inventory["BlueGun"].in_inventory = true
 		inventory["BlueGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
-		if y_position == 0:
-			picked_up_item.emit("BlueGun", "ground")
-		elif y_position != 0:
-			picked_up_item.emit("BlueGun", "table")
+		var collided_object_id = $Camera3D/ItemRayCast.get_collider_rid()
+		if $Camera3D/ItemRayCast.is_colliding() == true:
+			picked_up_item.emit(collided_object_id)
 
 
 # Pick up red gun
@@ -393,7 +392,9 @@ func _on_pickup_red_gun_display_message(message, ammo):
 		inventory["RedGun"].in_inventory = true
 		inventory["RedGun"].ammo += ammo
 		$UI/Control/message_text.text = ""
-		picked_up_item.emit("RedGun")
+		var collided_object_id = $Camera3D/ItemRayCast.get_collider_rid()
+		if $Camera3D/ItemRayCast.is_colliding() == true:
+			picked_up_item.emit(collided_object_id)
 
 
 # Drop the currently equipped weapon

@@ -31,15 +31,17 @@ func _on_player_item_collection_collide(object: Variant) -> void:
 		#print("Press E to pick up Blue Gun")
 
 
-func _on_player_picked_up_item(object: Variant) -> void:
+func _on_player_picked_up_item(object):
+	var my_pickup_range_rid = $Cube/PickupRange.get_rid()
 	# If the gun is not on the ground, respawn it
 	if self.position.y != 0:
-		if object == "RedGun":
+		if str(object) == str(my_pickup_range_rid):
 			self.visible = false
 			$Cube/PickupRange/CollisionShape3D.disabled = true
 			$RespawnTimer.start()
+	# If the gun is on the ground, don't respawn it
 	elif self.position.y == 0:
-		if object == "RedGun":
+		if str(object) == str(my_pickup_range_rid):
 			self.visible = false
 			$Cube/PickupRange/CollisionShape3D.disabled = true
 

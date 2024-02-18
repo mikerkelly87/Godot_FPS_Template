@@ -17,10 +17,10 @@ func _process(delta):
 
 
 # Make any instance on the floor disappear after 3 seconds
-func gun_disappear():
-	if self.position.y == 0:
-		print("Disappear timer started")
-		$DisappearTimer.start()
+#func gun_disappear():
+#	if self.position.y == 0:
+#		print("Disappear timer started")
+#		$DisappearTimer.start()
 
 
 func _on_area_3d_body_entered(body):
@@ -34,20 +34,21 @@ func _on_area_3d_body_exited(body):
 func _on_player_item_collection_collide(object: Variant) -> void:
 	var my_pickup_range_rid = $Cube/PickupRange.get_rid()
 	if str(object) == str(my_pickup_range_rid):
-		display_message.emit("Press E to pick up Blue Gun", ammo_count, self.position.y)
+		display_message.emit("Press E to pick up Blue Gun", ammo_count)
 		#print("Press E to pick up Blue Gun")
 
 
-func _on_player_picked_up_item(object, location):
+func _on_player_picked_up_item(object):
+	var my_pickup_range_rid = $Cube/PickupRange.get_rid()
 	# If the gun is not on the ground, respawn it
 	if self.position.y != 0:
-		if object == "BlueGun" && location == "table":
+		if str(object) == str(my_pickup_range_rid):
 			self.visible = false
 			$Cube/PickupRange/CollisionShape3D.disabled = true
 			$RespawnTimer.start()
 	# If the gun is on the ground, don't respawn it
 	elif self.position.y == 0:
-		if object == "BlueGun" && location == "ground":
+		if str(object) == str(my_pickup_range_rid):
 			self.visible = false
 			$Cube/PickupRange/CollisionShape3D.disabled = true
 
@@ -68,7 +69,7 @@ func initialize(player_position, player, current_ammo):
 	player.item_collection_collide.connect(_on_player_item_collection_collide)
 	player.picked_up_item.connect(_on_player_picked_up_item)
 	ammo_count = current_ammo
-	gun_disappear()
+#	gun_disappear()
 
 
 func _on_disappear_timer_timeout():
