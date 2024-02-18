@@ -30,7 +30,7 @@ Another pretty self explanatory feature is when you press `spacebar` on the keyb
 ## Items
 
 #### Picking Up Weapons
-When you get close to a weapon and you move your crosshair over it, you will be presented with some text to press `E` on the keyboard to pickup the weapon.
+When you get close to a weapon and you hover the crosshair over the weapon, you will be presented with some text to press `E` on the keyboard to pickup the weapon.
 When you pickup a weapon, it will be displayed in the weapon selection section at the top of the screen.
 ![Pickup](gifs/Godot_FPS_pickup.gif)
 
@@ -46,7 +46,10 @@ When you press `G` on the keyboard you will drop your currently equipped weapon 
 #### Picking Up Dropped Weapons
 When you pickup a weapon that was dropped on the ground, the ammo count will be the same as it was when you dropped it.
 To give a better explanation, when you first pickup a weapon from the table it will have an ammo count of 10.
-The animated demo below shows that dropping a weapon with an ammo count of 18, then picking up a new weapon with an ammo count of 10, and then picking back up the weapon on the ground (which had an ammo count of 18), will result in an ammo count of 28.
+The animated demo below shows the player drop a weapon with an ammo count of 18.
+Then the player picks up a new weapon from the table with an ammo count of 10.
+Then the player picks back up the weapon on the ground (which had an ammo count of 18).
+This results in a new ammo count of 28.
 ![Pickup dropped](gifs/Godot_FPS_pickup_dropped_weapon.gif)
 
 
@@ -70,11 +73,12 @@ When damage is taken, the health bar will go down and the screen will momentaril
 
 #### Pause Menu
 Menus are not very exciting, but they are necessary in games.
+When you press `Esc` on the keyboard the pause menu will come up and the game will enter a paused state.
 The pause menu will allow you to resume the game, restart the game, exit the game, or adjust the mouse sensitivity in the settings.
 ![Pause menu](gifs/Godot_FPS_pause_menu.gif)
 
 #### Death Menu
-When you health reaches 0% you have died.
+When your health reaches 0% you have died.
 The death menu allows you to restart or quit the game.
 ![Death menu](gifs/Godot_FPS_player_death.gif)
 
@@ -88,12 +92,14 @@ If I were going to continue improving on this project, here are a few things I m
 
 3. I would add magazines to the weapons along with a reload mechanic.
 
-4. I might have the enemies in a separate room with a door. Then I would add a button I had to press by pressing `E` on the keyboard to open the door.
+4. I would have the enemies in a separate room with a door. Then I would add a button I had to press by pressing `E` on the keyboard to open the door.
 
-5. I might add a second type of enemy that has a ranged weapon and can deal damage to the player if they player is within a certain range.
+5. I would add a second type of enemy that has a ranged weapon and can deal damage to the player if the player is within a certain range.
 
-6. I might add more options to the settings menu. Perhaps adjusting separate audio levels for the background sounds and sound effects. I might also add a slider to adjust the player's field of vision.
+6. I would add more options to the settings menu. Perhaps adjusting separate audio levels for the background sounds and sound effects. I would also add a slider to adjust the player's field of vision.
+
+7. I would smooth out the crouching by using an animation.
 
 
 ## Final thoughts
-As stated before, this project was just for me to further my learning of the Godot game engine. Feel free to clone this repo and use the code however you see fit. This project was created with the open source [Godot](https://godotengine.org/) game engine, version 4.2.1. I look forward to furthering my learning of this game engine, and would definitely recommend learning it others.
+As stated before, this project was just for me to further my learning of the Godot game engine. Feel free to clone this repo and use the code however you would like. This project was created with the open source [Godot](https://godotengine.org/) game engine, version 4.2.1. I look forward to furthering my learning of this game engine, and would definitely recommend learning it to others.
